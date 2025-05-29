@@ -1,0 +1,178 @@
+/* content.css - Styles for the injected modal */
+#mailmancer-modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+.mailmancer-modal {
+  width: 90%;
+  max-width: 600px;
+  background-color: #121212;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 24px;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  margin: 0 auto;
+  position: relative;
+  top: 0;
+  left: 0;
+  transform: none;
+  box-sizing: border-box;
+}
+
+.mailmancer-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.mailmancer-logo {
+  font-size: 24px;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.mailmancer-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.mailmancer-input-group {
+  margin-bottom: 20px;
+}
+
+.mailmancer-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.mailmancer-textarea {
+  width: 100%;
+  min-height: 100px;
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  color: white;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+  margin: 0 auto;
+  display: block;
+}
+
+.mailmancer-textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+}
+
+.mailmancer-tone-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.mailmancer-tone-option {
+  display: inline-flex;
+  align-items: center;
+  background-color: #2a2a2a;
+  padding: 8px 12px;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid #3a3a3a;
+}
+
+.mailmancer-tone-option input {
+  margin-right: 6px;
+}
+
+.mailmancer-tone-option:hover {
+  background-color: #333;
+  border-color: #6366f1;
+}
+
+.mailmancer-tone-option input:checked + span,
+.mailmancer-tone-option input:checked {
+  color: #6366f1;
+  font-weight: 500;
+}
+
+.mailmancer-result {
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+}
+
+.mailmancer-result.error {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.options-link {
+  color: #6366f1;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.options-link:hover {
+  text-decoration: underline;
+}
+
+.mailmancer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.mailmancer-button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.mailmancer-button-secondary {
+  background-color: #333;
+  color: white;
+}
+
+.mailmancer-button-secondary:hover {
+  background-color: #444;
+}
+
+.mailmancer-button-primary {
+  background-color: #6366f1;
+  color: white;
+}
+
+.mailmancer-button-primary:hover {
+  background-color: #4f46e5;
+}

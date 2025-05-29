@@ -1,0 +1,191 @@
+/* options.css - Styles for the options page */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #121212;
+  color: white;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 20px;
+}
+
+.logo {
+  font-size: 32px;
+  margin-right: 15px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.option-section {
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.input-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="password"] {
+  background-color: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 12px;
+  color: white;
+  font-family: inherit;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+}
+
+.input-group {
+  position: relative;
+}
+
+#show-hide-key {
+  position: absolute;
+  right: 10px;
+  top: 40px;
+  background: none;
+  border: none;
+  color: #6366f1;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 5px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  font-size: 16px;
+}
+
+button.primary {
+  background-color: #6366f1;
+  color: white;
+}
+
+button.primary:hover {
+  background-color: #4f46e5;
+}
+
+#status-message {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 6px;
+  display: none;
+}
+
+#status-message.success {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  display: block;
+}
+
+#status-message.error {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  display: block;
+}
+
+.tone-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.tone-option {
+  display: inline-flex;
+  align-items: center;
+  background-color: #2a2a2a;
+  padding: 10px 16px;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid #3a3a3a;
+}
+
+.tone-option:hover {
+  background-color: #333;
+  border-color: #6366f1;
+}
+
+.tone-option input {
+  margin-right: 8px;
+}
+
+.tone-option input:checked + span {
+  color: #6366f1;
+  font-weight: 500;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 40px;
+  color: #888;
+  font-size: 14px;
+}
+
+.footer a {
+  color: #6366f1;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}

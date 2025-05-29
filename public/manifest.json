@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "MailMancer",
+  "version": "0.1.0",
+  "description": "AI-powered email assistant for Gmail",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "MailMancer"
+  },
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://mail.google.com/*"],
+      "js": ["js/content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "options_page": "options.html"
+}

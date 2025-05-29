@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MailMancer Options</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">✨</div>
+      <h1>MailMancer Options</h1>
+    </div>
+    
+    <div class="option-section">
+      <h2>API Key</h2>
+      <p>Enter your OpenAI API key to use MailMancer. Your key is stored locally and is never sent to our servers.</p>
+      <div class="input-group">
+        <label for="api-key">OpenAI API Key</label>
+        <input type="password" id="api-key" placeholder="sk-...">
+        <button id="show-hide-key" type="button">Show</button>
+      </div>
+      <div class="actions">
+        <button id="save-key" class="primary">Save</button>
+      </div>
+      <div id="status-message"></div>
+    </div>
+    
+    <div class="option-section">
+      <h2>Default Tone</h2>
+      <p>Select your preferred default tone for email generation.</p>
+      <div class="tone-options">
+        <label class="tone-option">
+          <input type="radio" name="default-tone" value="casual">
+          <span>Casual</span>
+        </label>
+        <label class="tone-option">
+          <input type="radio" name="default-tone" value="professional" checked>
+          <span>Professional</span>
+        </label>
+        <label class="tone-option">
+          <input type="radio" name="default-tone" value="friendly">
+          <span>Friendly</span>
+        </label>
+        <label class="tone-option">
+          <input type="radio" name="default-tone" value="concise">
+          <span>Concise</span>
+        </label>
+      </div>
+      <div class="actions">
+        <button id="save-tone" class="primary">Save</button>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>MailMancer v1.0.0 | <a href="https://github.com/yourusername/MailMancer" target="_blank">GitHub</a></p>
+    </div>
+  </div>
+  
+  <script src="js/options.js"></script>
+</body>
+</html>
