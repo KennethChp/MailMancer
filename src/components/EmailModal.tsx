@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import useStore from '../store/useStore';
-import { generateText } from '../utils/api';
+import { generateText, generateEmailReply } from '../utils/api';
 
 interface EmailModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialPrompt?: string;
+  emailContent?: string;
   onInsert: (text: string) => void;
 }
 
-const EmailModal = ({ isOpen, onClose, initialPrompt = '', onInsert }: EmailModalProps) => {
+const EmailModal = ({ isOpen, onClose, initialPrompt = '', emailContent = '', onInsert }: EmailModalProps) => {
+  // Debug email content
+  console.log('MailMancer EmailModal: Email content available:', !!emailContent, 'Length:', emailContent?.length || 0);
   const { 
     apiKey, 
     preferences,
@@ -31,8 +34,11 @@ const EmailModal = ({ isOpen, onClose, initialPrompt = '', onInsert }: EmailModa
       setGeneratedText('');
       setError(null);
       setStatus('idle');
+      
+      // Debug email content when modal opens
+      console.log('MailMancer EmailModal (on open): Email content available:', !!emailContent, 'Length:', emailContent?.length || 0);
     }
-  }, [isOpen, initialPrompt, preferences.defaultTone, setError, setStatus]);
+  }, [isOpen, initialPrompt, emailContent, preferences.defaultTone, setError, setStatus]);
 
   // Handle generate button click
   const handleGenerate = async () => {
@@ -57,6 +63,37 @@ const EmailModal = ({ isOpen, onClose, initialPrompt = '', onInsert }: EmailModa
         setStatus('success');
       } else {
         setError(response.error || 'Failed to generate text');
+        setStatus('error');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      setStatus('error');
+    }
+  };
+  
+  // Handle reply button click
+  const handleReply = async () => {
+    if (!emailContent) {
+      setError('No email content detected. Make sure you are viewing an email.');
+      return;
+    }
+
+    if (!apiKey) {
+      setError('OpenAI API key is not set. Please set it in the extension options.');
+      return;
+    }
+
+    setStatus('generating');
+    setError(null);
+
+    try {
+      const response = await generateEmailReply(emailContent, tone, apiKey);
+      
+      if (response.success && response.text) {
+        setGeneratedText(response.text);
+        setStatus('success');
+      } else {
+        setError(response.error || 'Failed to generate reply');
         setStatus('error');
       }
     } catch (err) {
@@ -130,31 +167,53 @@ const EmailModal = ({ isOpen, onClose, initialPrompt = '', onInsert }: EmailModa
           </div>
         )}
 
-        <div className="flex justify-end gap-3">
-          <button onClick={onClose} className="btn btn-secondary">
+        {/* Debug info - remove in production */}
+        <div style={{
+          margin: '0 0 16px 0',
+          padding: '8px',
+          border: '1px solid #666',
+          borderRadius: '4px',
+          fontSize: '12px',
+          color: '#eee'
+        }}>
+          {emailContent ? 
+            `Email content detected (${emailContent.length} characters)` : 
+            'No email content detected. Reply button will still be shown for testing.'}
+        </div>
+
+        {/* Action buttons */}
+        <div style={{display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px'}}>
+          <button 
+            onClick={onClose} 
+            className="mailmancer-button mailmancer-button-cancel"
+          >
             Cancel
+          </button>
+          
+          {/* Reply button - Always visible */}
+          <button 
+            id="reply-button"
+            onClick={handleReply} 
+            disabled={status === 'generating'}
+            className="mailmancer-button mailmancer-button-reply"
+            style={{ zIndex: 9999 }}
+          >
+            {status === 'generating' ? 'Generating...' : 'Reply to Email ↩️'}
           </button>
           
           <button 
             onClick={handleGenerate} 
             disabled={status === 'generating'}
-            className="btn btn-primary flex items-center"
+            className="mailmancer-button mailmancer-button-generate"
           >
-            {status === 'generating' ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Generating...
-              </>
-            ) : (
-              <>Generate ✨</>
-            )}
+            {status === 'generating' ? 'Generating...' : 'Generate ✨'}
           </button>
           
           {generatedText && (
-            <button onClick={handleInsert} className="btn btn-primary">
+            <button 
+              onClick={handleInsert} 
+              className="mailmancer-button mailmancer-button-insert"
+            >
               Insert
             </button>
           )}

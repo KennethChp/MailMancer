@@ -47,7 +47,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-[400px] w-[350px] bg-dark text-white p-6">
+    <div className="min-h-[400px] w-[350px] bg-gray-900 text-white p-6">
       <header className="flex items-center mb-6">
         <div className="text-2xl font-bold mr-2">✨</div>
         <h1 className="text-xl font-semibold">MailMancer</h1>

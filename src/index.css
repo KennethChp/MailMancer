@@ -9,7 +9,40 @@
 }
 
 body {
-  @apply bg-dark text-white;
+  @apply bg-gray-900 text-white;
+}
+
+/* Custom button styles that don't rely on Tailwind classes */
+.mailmancer-button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.mailmancer-button-cancel {
+  background-color: #374151;
+  color: white;
+}
+
+.mailmancer-button-reply {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.mailmancer-button-generate {
+  background-color: #6366f1;
+  color: white;
+}
+
+.mailmancer-button-insert {
+  background-color: #10b981;
+  color: white;
 }
 
 @layer components {
@@ -30,7 +63,7 @@ body {
   }
   
   .modal {
-    @apply fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm;
+    @apply fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm;
   }
   
   .modal-content {

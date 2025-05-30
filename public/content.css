@@ -176,3 +176,18 @@
 .mailmancer-button-primary:hover {
   background-color: #4f46e5;
 }
+
+/* Reply button styling */
+.mailmancer-button-reply {
+  background-color: #3b82f6;
+  color: white;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.mailmancer-button-reply:hover {
+  background-color: #2563eb;
+}

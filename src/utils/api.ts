@@ -83,3 +83,82 @@ export async function generateText(
     };
   }
 }
+
+/**
+ * Generate an email reply based on original email content
+ * @param originalEmail The original email thread content
+ * @param tone The desired tone (casual, professional, friendly, concise)
+ * @param apiKey OpenAI API key
+ */
+export async function generateEmailReply(
+  originalEmail: string,
+  tone: 'casual' | 'professional' | 'friendly' | 'concise',
+  apiKey: string
+): Promise<GenerateTextResponse> {
+  if (!apiKey) {
+    return {
+      success: false,
+      error: 'OpenAI API key is not set. Please set it in the extension options.'
+    };
+  }
+
+  try {
+    // Create OpenAI client
+    const openai = new OpenAI({
+      apiKey,
+      dangerouslyAllowBrowser: true // Required for browser usage
+    });
+
+    // Construct the system prompt based on the tone
+    let systemPrompt = 'You are a helpful assistant that writes email replies.';
+    
+    switch (tone) {
+      case 'casual':
+        systemPrompt += ' Write in a casual, conversational tone. Be relaxed and friendly, as if writing to a friend.';
+        break;
+      case 'professional':
+        systemPrompt += ' Write in a professional, formal tone. Be clear, concise, and maintain appropriate business etiquette.';
+        break;
+      case 'friendly':
+        systemPrompt += ' Write in a friendly, warm tone. Be personable and approachable while maintaining professionalism.';
+        break;
+      case 'concise':
+        systemPrompt += ' Write in a concise, to-the-point tone. Be brief and direct, focusing only on essential information.';
+        break;
+    }
+    
+    systemPrompt += ' Generate a thoughtful reply to the email thread provided. Address all relevant points from the original email.';
+
+    // Make API call to OpenAI
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Here is the email thread I need to reply to:\n\n${originalEmail}\n\nPlease generate a well-structured reply that addresses the key points in this email.` }
+      ],
+      temperature: 0.7,
+      max_tokens: 500
+    });
+
+    // Extract the generated text
+    const generatedText = response.choices[0]?.message?.content;
+
+    if (!generatedText) {
+      return {
+        success: false,
+        error: 'No response generated'
+      };
+    }
+
+    return {
+      success: true,
+      text: generatedText
+    };
+  } catch (error) {
+    console.error('Error generating email reply:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'An unknown error occurred'
+    };
+  }
+}

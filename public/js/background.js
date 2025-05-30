@@ -60,6 +60,53 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     
     return true; // Required for async sendResponse
   }
+  else if (message.action === 'generateReply') {
+    console.log('Background: Received generateReply action', message);
+    
+    // Check if API key is set
+    if (!openAIKey) {
+      console.log('Background: No API key set');
+      sendResponse({ 
+        success: false, 
+        error: 'OpenAI API key not set. Please set it in the extension options.' 
+      });
+      return true;
+    }
+    
+    // Validate email content
+    if (!message.emailContent) {
+      console.log('Background: No email content provided');
+      sendResponse({
+        success: false,
+        error: 'No email content provided. Please make sure you are viewing an email.'
+      });
+      return true;
+    }
+    
+    console.log('Background: Calling generateReply with email content length:', message.emailContent.length);
+    
+    // Generate reply using OpenAI API
+    generateReply(message.emailContent, message.tone)
+      .then(generatedText => {
+        console.log('Background: Reply generated successfully, length:', generatedText.length);
+        sendResponse({ 
+          success: true, 
+          generatedText: generatedText 
+        });
+        
+        // Save the tone preference
+        chrome.storage.local.set({ lastUsedTone: message.tone });
+      })
+      .catch(error => {
+        console.error('Background: Error generating reply:', error);
+        sendResponse({ 
+          success: false, 
+          error: error.message || 'Failed to generate reply' 
+        });
+      });
+    
+    return true; // Required for async sendResponse
+  }
   else if (message.action === 'setAPIKey') {
     openAIKey = message.apiKey;
     chrome.storage.local.set({ openAIKey: message.apiKey });
@@ -116,6 +163,7 @@ function createModalHTML(selectedText) {
       
       <div class="mailmancer-actions">
         <button id="mailmancer-cancel" class="mailmancer-button mailmancer-button-secondary">Cancel</button>
+        <button id="mailmancer-reply" class="mailmancer-button mailmancer-button-reply">Reply to Email ↩️</button>
         <button id="mailmancer-generate" class="mailmancer-button mailmancer-button-primary">Generate ✨</button>
         <button id="mailmancer-insert" class="mailmancer-button mailmancer-button-primary" style="display:none;">Insert</button>
       </div>
@@ -184,6 +232,83 @@ async function generateText(prompt, tone) {
     return data.choices[0].message.content;
   } catch (error) {
     console.error('Error generating text:', error);
+    throw error;
+  }
+}
+
+// Function to generate email reply using OpenAI API
+async function generateReply(emailContent, tone) {
+  try {
+    console.log('Background: generateReply called with tone:', tone);
+    console.log('Background: Email content length:', emailContent ? emailContent.length : 0);
+    
+    // Check if API key is set
+    if (!openAIKey) {
+      throw new Error('OpenAI API key not set. Please set it in the extension options.');
+    }
+    
+    // Construct the prompt based on the tone
+    let systemPrompt = 'You are a helpful assistant that writes email replies.';
+    
+    switch (tone) {
+      case 'casual':
+        systemPrompt += ' Write in a casual, conversational tone. Be relaxed and friendly, as if writing to a friend.';
+        break;
+      case 'professional':
+        systemPrompt += ' Write in a professional, formal tone. Be clear, concise, and maintain appropriate business etiquette.';
+        break;
+      case 'friendly':
+        systemPrompt += ' Write in a friendly, warm tone. Be personable and approachable while maintaining professionalism.';
+        break;
+      case 'concise':
+        systemPrompt += ' Write in a concise, to-the-point tone. Be brief and direct, focusing only on essential information.';
+        break;
+    }
+    
+    systemPrompt += ' Generate a thoughtful reply to the email thread provided. Address all relevant points from the original email.';
+    
+    // Prepare the user prompt with the email content
+    const userPrompt = `Here is the email thread I need to reply to:\n\n${emailContent}\n\nPlease generate a well-structured reply that addresses the key points in this email.`;
+    
+    console.log('Background: System prompt:', systemPrompt);
+    console.log('Background: Making API request to OpenAI for email reply...');
+    
+    // Make the actual API call to OpenAI
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openAIKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        max_tokens: 500,
+        temperature: 0.7
+      })
+    });
+    
+    const data = await response.json();
+    console.log('Background: Received response from OpenAI for email reply:', data);
+    
+    if (data.error) {
+      console.error('Background: OpenAI API error:', data.error);
+      throw new Error(data.error.message || 'Error from OpenAI API');
+    }
+    
+    if (!data.choices || data.choices.length === 0) {
+      console.error('Background: No choices in OpenAI response');
+      throw new Error('No response generated. Please try again.');
+    }
+    
+    const generatedText = data.choices[0].message.content;
+    console.log('Background: Generated reply text:', generatedText.substring(0, 50) + '...');
+    return generatedText;
+  } catch (error) {
+    console.error('Background: Error generating email reply:', error);
     throw error;
   }
 }
