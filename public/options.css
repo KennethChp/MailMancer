@@ -145,33 +145,69 @@ button.primary:hover {
 .tone-options {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   margin: 20px 0;
+  justify-content: flex-start;
 }
 
 .tone-option {
-  display: inline-flex;
-  align-items: center;
-  background-color: #2a2a2a;
-  padding: 10px 16px;
+  position: relative;
+}
+
+.tone-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.tone-option span {
+  display: inline-block;
+  background-color: #1e1e1e;
+  color: #aaa;
+  padding: 8px 16px;
   border-radius: 20px;
   transition: all 0.2s ease;
   cursor: pointer;
-  border: 1px solid #3a3a3a;
-}
-
-.tone-option:hover {
-  background-color: #333;
-  border-color: #6366f1;
-}
-
-.tone-option input {
-  margin-right: 8px;
-}
-
-.tone-option input:checked + span {
-  color: #6366f1;
+  font-size: 14px;
   font-weight: 500;
+  border: 1px solid #333;
+  min-width: 80px;
+  text-align: center;
+}
+
+.tone-option:hover span {
+  background-color: #2a2a2a;
+  color: #fff;
+}
+
+.tone-option input[type="radio"]:checked + span {
+  background-color: #2a2a2a;
+  color: #fff;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 1px #6366f1;
+}
+
+.save-all-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+#save-all {
+  background-color: #6366f1;
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  min-width: 200px;
+}
+
+#save-all:hover {
+  background-color: #4f46e5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .footer {

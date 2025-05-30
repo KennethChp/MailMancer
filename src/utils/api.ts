@@ -43,7 +43,7 @@ export async function generateText(
         systemPrompt += ' Write in a professional, formal tone. Be clear, concise, and maintain appropriate business etiquette.';
         break;
       case 'friendly':
-        systemPrompt += ' Write in a friendly, warm tone. Be personable and approachable while maintaining professionalism.';
+        systemPrompt += ' Write in a friendly, warm tone. Be personable and approachable while maintaining professionalism. Add emojis';
         break;
       case 'concise':
         systemPrompt += ' Write in a concise, to-the-point tone. Be brief and direct, focusing only on essential information.';
@@ -120,7 +120,7 @@ export async function generateEmailReply(
         systemPrompt += ' Write in a professional, formal tone. Be clear, concise, and maintain appropriate business etiquette.';
         break;
       case 'friendly':
-        systemPrompt += ' Write in a friendly, warm tone. Be personable and approachable while maintaining professionalism.';
+        systemPrompt += ' Write in a friendly, warm tone. Be personable and approachable while maintaining professionalism. Add emojis to the response.';
         break;
       case 'concise':
         systemPrompt += ' Write in a concise, to-the-point tone. Be brief and direct, focusing only on essential information.';

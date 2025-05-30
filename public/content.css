@@ -85,35 +85,47 @@
 .mailmancer-tone-options {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 20px;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .mailmancer-tone-option {
-  display: inline-flex;
-  align-items: center;
-  background-color: #2a2a2a;
-  padding: 8px 12px;
+  position: relative;
+}
+
+.mailmancer-tone-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.mailmancer-tone-option span {
+  display: inline-block;
+  background-color: #1e1e1e;
+  color: #aaa;
+  padding: 8px 16px;
   border-radius: 20px;
   transition: all 0.2s ease;
   cursor: pointer;
-  border: 1px solid #3a3a3a;
-}
-
-.mailmancer-tone-option input {
-  margin-right: 6px;
-}
-
-.mailmancer-tone-option:hover {
-  background-color: #333;
-  border-color: #6366f1;
-}
-
-.mailmancer-tone-option input:checked + span,
-.mailmancer-tone-option input:checked {
-  color: #6366f1;
+  font-size: 14px;
   font-weight: 500;
+  border: 1px solid #333;
+  min-width: 80px;
+  text-align: center;
+}
+
+.mailmancer-tone-option:hover span {
+  background-color: #2a2a2a;
+  color: #fff;
+}
+
+.mailmancer-tone-option input[type="radio"]:checked + span {
+  background-color: #2a2a2a;
+  color: #fff;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 1px #6366f1;
 }
 
 .mailmancer-result {

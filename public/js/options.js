@@ -3,8 +3,7 @@
 // DOM Elements
 const apiKeyInput = document.getElementById('api-key');
 const showHideKeyButton = document.getElementById('show-hide-key');
-const saveKeyButton = document.getElementById('save-key');
-const saveToneButton = document.getElementById('save-tone');
+const saveAllButton = document.getElementById('save-all');
 const statusMessage = document.getElementById('status-message');
 const toneOptions = document.querySelectorAll('input[name="default-tone"]');
 
@@ -13,8 +12,7 @@ document.addEventListener('DOMContentLoaded', loadOptions);
 
 // Event listeners
 showHideKeyButton.addEventListener('click', toggleApiKeyVisibility);
-saveKeyButton.addEventListener('click', saveApiKey);
-saveToneButton.addEventListener('click', saveDefaultTone);
+saveAllButton.addEventListener('click', saveAllSettings);
 
 // Function to load saved options
 function loadOptions() {
@@ -47,35 +45,26 @@ function toggleApiKeyVisibility() {
   }
 }
 
-// Function to save API key
-function saveApiKey() {
+// Function to validate and get API key
+function validateApiKey() {
   const apiKey = apiKeyInput.value.trim();
   
   if (!apiKey) {
     showStatus('Please enter an API key', 'error');
-    return;
+    return null;
   }
   
   // Validate API key format (basic check)
   if (!apiKey.startsWith('sk-')) {
     showStatus('API key should start with "sk-"', 'error');
-    return;
+    return null;
   }
   
-  // Save to Chrome storage
-  chrome.storage.local.set({ openAIKey: apiKey }, () => {
-    showStatus('API key saved successfully!', 'success');
-    
-    // Also send message to background script to update the key in memory
-    chrome.runtime.sendMessage({
-      action: 'setAPIKey',
-      apiKey: apiKey
-    });
-  });
+  return apiKey;
 }
 
-// Function to save default tone
-function saveDefaultTone() {
+// Function to get selected tone
+function getSelectedTone() {
   let selectedTone = 'professional'; // Default
   
   // Get the selected tone
@@ -86,9 +75,44 @@ function saveDefaultTone() {
     }
   }
   
-  // Save to Chrome storage
-  chrome.storage.local.set({ defaultTone: selectedTone }, () => {
-    showStatus('Default tone saved successfully!', 'success');
+  return selectedTone;
+}
+
+// Function to save all settings
+function saveAllSettings() {
+  // Validate and get API key
+  const apiKey = validateApiKey();
+  if (apiKey === null) {
+    return; // Validation failed
+  }
+  
+  // Get selected tone
+  const selectedTone = getSelectedTone();
+  
+  // Save both settings to Chrome storage
+  chrome.storage.local.set({ 
+    openAIKey: apiKey,
+    defaultTone: selectedTone 
+  }, () => {
+    showStatus('All settings saved successfully!', 'success');
+    
+    // Also send message to background script to update the key in memory
+    chrome.runtime.sendMessage({
+      action: 'setAPIKey',
+      apiKey: apiKey
+    });
+    
+    // Send message to update the default tone in any open popups
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id, {
+          action: 'updateDefaultTone',
+          tone: selectedTone
+        }).catch(() => {
+          // Ignore errors from tabs that don't have content scripts
+        });
+      });
+    });
   });
 }
 

@@ -9,10 +9,13 @@ document.body.appendChild(modalContainer);
 
 // Listen for keyboard shortcut (Ctrl+Shift+M)
 document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+  if (e.ctrlKey && e.shiftKey && (e.key === 'M' || e.key === 'm')) {
+    e.preventDefault(); // Prevent default browser/Gmail behavior
+    e.stopPropagation(); // Stop event from bubbling up
     toggleModal();
+    return false;
   }
-});
+}, true); // 'true' enables capture phase, so our listener runs before Gmail's
 
 // Function to toggle the modal
 function toggleModal() {
@@ -55,9 +58,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.action === 'renderModal') {
     renderModal(message.html);
     sendResponse({ success: true });
+  } else if (message.action === 'updateDefaultTone') {
+    // Update the tone selection in the popup if it's open
+    if (modalContainer.style.display === 'block') {
+      updateToneSelection(message.tone);
+    }
+    sendResponse({ success: true });
   }
   return true;
 });
+
+// Function to update tone selection in the popup
+function updateToneSelection(tone) {
+  const toneElements = modalContainer.querySelectorAll('input[name="mailmancer-tone"]');
+  for (const element of toneElements) {
+    if (element.value === tone) {
+      element.checked = true;
+      break;
+    }
+  }
+}
 
 // Function to insert text into the active email compose field
 function insertTextIntoEmail(text) {
@@ -201,6 +221,13 @@ function renderModal(html) {
       modalContainer.style.display = 'none';
     });
   }
+  
+  // Load default tone from storage and update the tone selection
+  chrome.storage.local.get(['defaultTone'], (result) => {
+    if (result.defaultTone) {
+      updateToneSelection(result.defaultTone);
+    }
+  });
   
   // Get the Reply button
   const replyButton = modalContainer.querySelector('#mailmancer-reply');
