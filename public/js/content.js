@@ -24,12 +24,25 @@ function toggleModal() {
     // Get the current selected text from the compose area
     const selectedText = window.getSelection().toString();
     
-    // Send message to background script to open modal
-    chrome.runtime.sendMessage({
-      action: 'openModal',
-      selectedText
-    });
+    try {
+      // Send message to background script to open modal
+      chrome.runtime.sendMessage({
+        action: 'openModal',
+        selectedText
+      }, (response) => {
+        // Check for runtime error
+        if (chrome.runtime.lastError) {
+          console.warn('MailMancer: Error sending message to background script:', chrome.runtime.lastError.message);
+          // Continue showing the modal even if the message fails
+        }
+      });
+    } catch (error) {
+      // Handle any exceptions that might occur
+      console.error('MailMancer: Failed to communicate with background script:', error);
+      // We'll still show the modal even if communication fails
+    }
     
+    // Show the modal regardless of whether the message was sent successfully
     modalContainer.style.display = 'block';
   }
 }
@@ -272,6 +285,14 @@ function renderModal(html) {
         emailContent: emailContent,
         tone: tone
       }, (response) => {
+        // Check for runtime error
+        if (chrome.runtime.lastError) {
+          console.warn('MailMancer: Error sending message to background script:', chrome.runtime.lastError.message);
+          // If there's an error, try the direct API approach
+          handleDirectApiCall(emailContent, tone, replyButton, resultContainer);
+          return;
+        }
+        
         // Check if there was a response
         if (!response) {
           console.error('MailMancer: No response from background script, trying direct API call');
@@ -510,56 +531,92 @@ function renderModal(html) {
       }
       
       // Send message to background script to generate text
-      chrome.runtime.sendMessage({
-        action: 'generateText',
-        prompt,
-        tone
-      }, (response) => {
+      try {
+        chrome.runtime.sendMessage({
+          action: 'generateText',
+          prompt,
+          tone
+        }, (response) => {
+          // Check for runtime error
+          if (chrome.runtime.lastError) {
+            console.warn('MailMancer: Error sending message to background script:', chrome.runtime.lastError.message);
+            
+            // Reset button state
+            if (generateButton) {
+              generateButton.disabled = false;
+              generateButton.textContent = 'Generate ✨';
+            }
+            
+            // Show error message
+            if (resultContainer) {
+              resultContainer.textContent = 'Error communicating with the extension. Please try reloading the page.';
+              resultContainer.style.display = 'block';
+              resultContainer.classList.add('error');
+            }
+            return;
+          }
+          
+          // Reset button state
+          if (generateButton) {
+            generateButton.disabled = false;
+            generateButton.textContent = 'Generate ✨';
+          }
+          
+          if (response && response.success) {
+            // Update the modal with the generated text
+            if (resultContainer) {
+              resultContainer.textContent = response.generatedText;
+              resultContainer.style.display = 'block';
+              
+              // Show the insert button
+              const insertButton = modalContainer.querySelector('#mailmancer-insert');
+              if (insertButton) {
+                insertButton.style.display = 'inline-block';
+              }
+            }
+          } else {
+            // Show error message
+            if (resultContainer) {
+              resultContainer.textContent = response && response.error ? 
+                `Error: ${response.error}` : 
+                'An error occurred while generating text. Please try again.';
+              resultContainer.style.display = 'block';
+              resultContainer.classList.add('error');
+              
+              // Add a link to options page if API key is missing
+              if (response && response.error && response.error.includes('API key')) {
+                const optionsLink = document.createElement('a');
+                optionsLink.href = '#';
+                optionsLink.textContent = 'Open Options Page';
+                optionsLink.className = 'options-link';
+                optionsLink.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  chrome.runtime.openOptionsPage();
+                });
+                
+                resultContainer.appendChild(document.createElement('br'));
+                resultContainer.appendChild(document.createElement('br'));
+                resultContainer.appendChild(optionsLink);
+              }
+            }
+          }
+        });
+      } catch (error) {
+        console.error('MailMancer: Error sending message to generate text:', error);
+        
         // Reset button state
         if (generateButton) {
           generateButton.disabled = false;
           generateButton.textContent = 'Generate ✨';
         }
         
-        if (response && response.success) {
-          // Update the modal with the generated text
-          if (resultContainer) {
-            resultContainer.textContent = response.generatedText;
-            resultContainer.style.display = 'block';
-            
-            // Show the insert button
-            const insertButton = modalContainer.querySelector('#mailmancer-insert');
-            if (insertButton) {
-              insertButton.style.display = 'inline-block';
-            }
-          }
-        } else {
-          // Show error message
-          if (resultContainer) {
-            resultContainer.textContent = response && response.error ? 
-              `Error: ${response.error}` : 
-              'An error occurred while generating text. Please try again.';
-            resultContainer.style.display = 'block';
-            resultContainer.classList.add('error');
-            
-            // Add a link to options page if API key is missing
-            if (response && response.error && response.error.includes('API key')) {
-              const optionsLink = document.createElement('a');
-              optionsLink.href = '#';
-              optionsLink.textContent = 'Open Options Page';
-              optionsLink.className = 'options-link';
-              optionsLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                chrome.runtime.openOptionsPage();
-              });
-              
-              resultContainer.appendChild(document.createElement('br'));
-              resultContainer.appendChild(document.createElement('br'));
-              resultContainer.appendChild(optionsLink);
-            }
-          }
+        // Show error message
+        if (resultContainer) {
+          resultContainer.textContent = 'Error communicating with the extension. Please try reloading the page.';
+          resultContainer.style.display = 'block';
+          resultContainer.classList.add('error');
         }
-      });
+      }
     });
   }
   
